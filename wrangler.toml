@@ -70,7 +70,7 @@ enabled = true
 head_sampling_rate = 0.1
 
 [triggers]
-crons = ["*/10 * * * *", "10 * * * *", "0 */6 * * *", "0 */12 * * *", "0 4 * * *"]
+crons = ["*/10 * * * *", "10 * * * *", "0 */6 * * *"]
 
 # Branch Previews share staging data; they never bind production resources.
 [previews]
