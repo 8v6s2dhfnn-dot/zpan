@@ -192,6 +192,16 @@ jobs:
       # build-time defines. Must run after the D1 id patch so the generated
       # config carries the real database_id. ZPAN_APP_VERSION sidesteps a git
       # describe on the shallow tag checkout.
+      - name: Verify checked out source
+        run: |
+          echo "===== git remote ====="
+          git remote -v
+
+          echo "===== commit ====="
+          git rev-parse HEAD
+
+          echo "===== wrangler KV ====="
+          grep -n -A3 -B2 "CACHE_KV" wrangler.toml
       - name: Build
         env:
           ZPAN_APP_VERSION: ${{ steps.release.outputs.version }}
