@@ -3,10 +3,8 @@
 import { createDeps } from '../server/composition'
 import { createCloudflarePlatform } from '../server/platform/cloudflare'
 import { syncPendingRemoteDownloadUsageReports } from '../server/usecases/downloads/remote-download-usage'
-import { purgeExpiredTrash, resolveTrashRetentionDays } from '../server/usecases/object'
 import { purgeExpiredResourceChanges } from '../server/usecases/resource-changes'
 import { reconcileImageDomains } from '../server/usecases/site/image-domain-provider'
-import { INSTANCE_TELEMETRY_CRON, reportInstanceTelemetry } from '../server/usecases/site/instance-telemetry'
 import { runLicensingRefresh } from '../server/usecases/site/licensing'
 import { syncPendingCloudTrafficReports } from '../server/usecases/store/traffic-metering'
 import { ZPAN_CLOUD_URL_DEFAULT } from '../shared/constants'
@@ -23,12 +21,7 @@ export interface ScheduledEnv {
 
 const TRAFFIC_SYNC_CRON = '*/10 * * * *'
 const STATS_ROLLUP_CRON = '10 * * * *'
-const TRASH_PURGE_CRON = '0 4 * * *'
 type ScheduledTrigger = Pick<ScheduledEvent, 'cron'>
-
-function envAllowsIp(value: string | undefined): boolean {
-  return !['0', 'false', 'no', 'off'].includes(value?.trim().toLowerCase() ?? '')
-}
 
 export async function handleScheduled(event: ScheduledTrigger, env: ScheduledEnv): Promise<void> {
   const platform = createCloudflarePlatform(env)
@@ -51,26 +44,6 @@ export async function handleScheduled(event: ScheduledTrigger, env: ScheduledEnv
       purgeExpiredResourceChanges(deps, now),
       reconcileImageDomains(deps),
     ])
-    return
-  }
-
-  if (event.cron === TRASH_PURGE_CRON) {
-    await purgeExpiredTrash(deps, resolveTrashRetentionDays(env.ZPAN_TRASH_RETENTION_DAYS))
-    return
-  }
-
-  if (event.cron === INSTANCE_TELEMETRY_CRON) {
-    await reportInstanceTelemetry(deps, {
-      config: {
-        allowIp: envAllowsIp(env.ZPAN_TELEMETRY_ALLOW_IP),
-      },
-      cron: event.cron,
-      trigger: 'scheduled',
-      runtime: {
-        runtime: 'workerd',
-        platform: 'cloudflare-workers',
-      },
-    })
     return
   }
 
