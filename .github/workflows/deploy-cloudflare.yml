@@ -205,6 +205,25 @@ jobs:
           ZPAN_APP_VERSION: ${{ steps.release.outputs.version }}
           ZPAN_APP_COMMIT: ${{ github.sha }}
         run: pnpm build
+      - name: Debug generated Wrangler config
+        run: |
+          echo "===== git remote ====="
+          git remote -v
+
+          echo "===== commit ====="
+          git rev-parse HEAD
+
+          echo "===== source wrangler.toml ====="
+          grep -n -A15 '^\[triggers\]' wrangler.toml || true
+
+          echo "===== source scheduled.ts ====="
+          grep -n -E 'CRON|cron|QUOTA_RESET|0 0 1' workers/scheduled.ts || true
+
+          echo "===== generated wrangler.json ====="
+          cat dist/zpan/wrangler.json
+
+          echo "===== generated cron config ====="
+          grep -n -A15 -B3 -E 'crons|triggers' dist/zpan/wrangler.json || true
       - name: Inspect generated Wrangler config
         run: |
           echo "===== dist/zpan/wrangler.json ====="
