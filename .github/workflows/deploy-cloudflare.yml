@@ -197,7 +197,16 @@ jobs:
           ZPAN_APP_VERSION: ${{ steps.release.outputs.version }}
           ZPAN_APP_COMMIT: ${{ github.sha }}
         run: pnpm build
+      - name: Inspect generated Wrangler config
+        run: |
+          echo "===== dist/zpan/wrangler.json ====="
+          cat dist/zpan/wrangler.json
 
+          echo "===== Search KV configuration ====="
+          grep -n -A5 -B5 "kv_namespaces" dist/zpan/wrangler.json || true
+
+          echo "===== Search old KV ID ====="
+          grep -R "2721f9d7b47d433d8a0e02171e276f57" dist/zpan .wrangler 2>/dev/null || true
       - name: Deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
