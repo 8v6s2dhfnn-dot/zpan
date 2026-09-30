@@ -1,6 +1,5 @@
 // CF Workers scheduled() handler.
 
-import { createQuotaRepo } from '../server/adapters/repos/quota'
 import { createDeps } from '../server/composition'
 import { createCloudflarePlatform } from '../server/platform/cloudflare'
 import { syncPendingRemoteDownloadUsageReports } from '../server/usecases/downloads/remote-download-usage'
@@ -24,7 +23,6 @@ export interface ScheduledEnv {
 
 const TRAFFIC_SYNC_CRON = '*/10 * * * *'
 const STATS_ROLLUP_CRON = '10 * * * *'
-const QUOTA_RESET_CRON = '0 0 1 * *'
 const TRASH_PURGE_CRON = '0 4 * * *'
 type ScheduledTrigger = Pick<ScheduledEvent, 'cron'>
 
@@ -53,11 +51,6 @@ export async function handleScheduled(event: ScheduledTrigger, env: ScheduledEnv
       purgeExpiredResourceChanges(deps, now),
       reconcileImageDomains(deps),
     ])
-    return
-  }
-
-  if (event.cron === QUOTA_RESET_CRON) {
-    await createQuotaRepo(platform.db).resetExpiredTrafficQuotas()
     return
   }
 
