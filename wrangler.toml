@@ -28,7 +28,7 @@ migrations_dir = "./migrations"
 
 [[kv_namespaces]]
 binding = "CACHE_KV"
-id = "2721f9d7b47d433d8a0e02171e276f57"
+id = "3d666e4f5cb14f26b4dc2bea475be276"
 
 [[ratelimits]]
 name = "WEBDAV_RATE_LIMITER"
@@ -89,7 +89,7 @@ migrations_dir = "./migrations"
 
 [[previews.kv_namespaces]]
 binding = "CACHE_KV"
-id = "7d8625bacbc54e23a46ca4464a9f64a0"
+id = "3d666e4f5cb14f26b4dc2bea475be276"
 
 [[previews.ratelimits]]
 name = "WEBDAV_RATE_LIMITER"
